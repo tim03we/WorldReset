@@ -29,7 +29,13 @@ class WorldReset extends PluginBase {
     public function onEnable()
     {
         $this->saveResource("settings.yml");
+        $this->saveResource("README.md");
         $this->cfg = new Config($this->getDataFolder() . "settings.yml", Config::YAML);
+        if($this->cfg->get("finish") == false) {
+            $this->getLogger()->alert('Once you have read the instructions and the config is set, you can set "finish" to true.');
+            $this->getServer()->getPluginManager()->disablePlugin($this->getServer()->getPluginManager()->getPlugin("WorldReset"));
+            return true;
+        }
         if(!is_array($this->cfg->get("worlds"))) {
             $this->getLogger()->alert("Please list the worlds in the config in a list. See the respective config example. Plugin is disabled.");
             $this->getServer()->getPluginManager()->disablePlugin($this->getServer()->getPluginManager()->getPlugin("WorldReset"));
@@ -52,23 +58,44 @@ class WorldReset extends PluginBase {
             }
         }
         foreach($this->cfg->get("worlds") as $levels) {
-            if(!file_exists($this->getServer()->getDataPath() . "worlds/$levels/level.dat")) {
+            if(!file_exists($this->getServer()->getDataPath() . "worldreset/$levels.zip")) {
                 $this->getLogger()->alert('A world specified in the config was not found in the "worldreset" folder. Plugin is disabled.');
                 $this->getServer()->getPluginManager()->disablePlugin($this->getServer()->getPluginManager()->getPlugin("WorldReset"));
                 return true;
             }
             if($this->getServer()->isLevelLoaded($levels)) {
-                $this->getServer()->unloadLevel($levels);
+                $this->getServer()->unloadLevel($this->getServer()->getLevelByName($levels));
             }
-            $zip = new \ZipArchive;
-            $zip->open($this->getServer()->getDataPath() . "worldreset/$levels.zip");
-            $zip->extractTo($this->getServer()->getDataPath() . "worlds");
-            $zip->close();
-            unset($zip);
+            $this->extract($levels);
+            $this->rmFolder($this->getServer()->getDataPath() . "worlds/$levels");
+            $this->extract($levels);
             $this->getServer()->loadLevel($levels);
-            if(!$this->cfg->get("message", false)) {
+            if($this->cfg->get("message", !false)) {
                 $this->getServer()->broadcastMessage($this->cfg->get("message"));
             }
         }
+    }
+
+    public function rmFolder($file) {
+        if (is_dir($file)) {
+            $resource = opendir($file);
+            while($filename = readdir($resource)) {
+                if ($filename != "." && $filename != "..") {
+                    $this->rmFolder($file."/".$filename);
+                }
+            }
+            closedir($resource);
+            rmdir($file);
+        } else {
+            unlink($file);
+        }
+    }
+
+    public function extract($levels) {
+        $zip = new \ZipArchive;
+        $zip->open($this->getServer()->getDataPath() . "worldreset/$levels.zip");
+        $zip->extractTo($this->getServer()->getDataPath() . "worlds");
+        $zip->close();
+        unset($zip);
     }
 }

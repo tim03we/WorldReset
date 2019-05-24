@@ -1,4 +1,7 @@
 ---
+# When you have adjusted the config, you can set it to true to load the plugin.
+finish: false
+
 # Set after how many minutes the world should be reset.
 time: 60
 

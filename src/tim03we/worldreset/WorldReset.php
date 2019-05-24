@@ -45,7 +45,7 @@ class WorldReset extends PluginBase {
                 $this->getServer()->loadLevel($levels);
             }
         }
-        $this->getScheduler()->scheduleRepeatingTask(new ResetTask($this), $this->cfg->get("time") * 60);
+        $this->getScheduler()->scheduleRepeatingTask(new ResetTask($this), $this->cfg->get("time") * 60 * 20);
         @mkdir($this->getServer()->getDataPath() . "worldreset/");
     }
 

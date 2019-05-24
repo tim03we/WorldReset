@@ -1,0 +1,17 @@
+---
+# Set after how many minutes the world should be reset.
+time: 60
+
+# Please list the worlds in a list. Example:
+# worlds:
+#   - "world1"
+#   - "world2"
+# or
+# worlds: ["world1", "world2"]
+# Important: Make sure you use upper and lower case.
+worlds: []
+
+# Set the worlds reset message.
+# Use false if you don't want to receive a message.
+message: "The worlds have been reset."
+...

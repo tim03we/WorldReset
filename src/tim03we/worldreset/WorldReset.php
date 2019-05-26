@@ -52,7 +52,7 @@ class WorldReset extends PluginBase {
     public function reset() {
         foreach($this->getServer()->getOnlinePlayers() as $player) {
             foreach($this->cfg->get("worlds") as $levels) {
-                if($player->getLevel()->getLevelByName() === $levels) {
+                if($player->getLevel()->getFolderName() === $levels) {
                     $player->teleport($this->getServer()->getDefaultLevel()->getSafeSpawn());
                 }
             }
